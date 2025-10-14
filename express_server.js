@@ -13,6 +13,8 @@ app.get('/some-html', (req, res) => {
 
 app.get('/some-json', (req, res) => {
 	const user = { age: 22, nom: 'Jane' };
+	console.log('Headers:', req.headers);
+	console.log('Body:', req.body);
 	res.json(user);
 });
 
