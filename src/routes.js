@@ -1,9 +1,5 @@
-import express from 'express';
-
-const app = express();
-const PORT = 3000;
-
-app.use(express.json());
+import { Router } from 'express';
+import { getUsers } from './db/utils.js';
 
 const tasks = [
 	{
@@ -16,35 +12,36 @@ const tasks = [
 
 let nextTaskId = tasks.length + 1;
 
-app.get('/', (_, res) => {
+export const router = Router();
+router.get('/', (_, res) => {
 	res.send('Hello from Express!');
 });
 
-app.get('/some-html', (_, res) => {
+router.get('/some-html', (_, res) => {
 	res.send('<html><body><h1>bonjour html</h1></body></html>');
 });
 
-app.get('/some-json', (req, res) => {
+router.get('/some-json', (req, res) => {
 	const user = { age: 22, nom: 'Jane' };
 	console.log('Headers:', req.headers);
 	console.log('Body:', req.body);
 	res.json(user);
 });
 
-app.get('/transaction', (_, res) => {
+router.get('/transaction', (_, res) => {
 	res.json([100, 2000, 3000]);
 });
 
-app.post('/data', (req, res) => {
+router.post('/data', (req, res) => {
 	console.log('Body:', req.body);
 	res.json(req.body);
 });
 
-app.get('/tasks', (_, res) => {
+router.get('/tasks', (_, res) => {
 	res.json(tasks);
 });
 
-app.post('/new-task', (req, res) => {
+router.post('/new-task', (req, res) => {
 	const { title, description, isDone } = req.body ?? {};
 
 	if (typeof title !== 'string' || typeof description !== 'string') {
@@ -62,7 +59,7 @@ app.post('/new-task', (req, res) => {
 	res.status(201).json(newTask);
 });
 
-app.put('/update-task/:id', (req, res) => {
+router.put('/update-task/:id', (req, res) => {
 	const taskId = Number.parseInt(req.params.id, 10);
 	const task = tasks.find((t) => t.id === taskId);
 
@@ -95,7 +92,7 @@ app.put('/update-task/:id', (req, res) => {
 	res.json(task);
 });
 
-app.delete('/delete-task/:id', (req, res) => {
+router.delete('/delete-task/:id', (req, res) => {
 	const taskId = Number.parseInt(req.params.id, 10);
 
 	if (!Number.isInteger(taskId)) {
@@ -111,7 +108,7 @@ app.delete('/delete-task/:id', (req, res) => {
 	res.json({ deleted: deletedTask });
 });
 
-app.get('/exo-query-string', (req, res) => {
+router.get('/exo-query-string', (req, res) => {
 	console.log('Query params:', req.query);
 	const { age } = req.query;
 	if (age) {
@@ -121,11 +118,12 @@ app.get('/exo-query-string', (req, res) => {
 	res.send('hello');
 });
 
-app.get('/get-user/:userId', (req, res) => {
+router.get('/get-user/:userId', (req, res) => {
 	const { userId } = req.params;
 	res.send(`User ID: ${userId}`);
 });
 
-app.listen(PORT, () => {
-	console.log(`Example app listening on http://localhost:${PORT}`);
+router.get('/get-users', async (req, res) => {
+	const users = await getUsers();
+	res.json(users);
 });
