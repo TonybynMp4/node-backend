@@ -32,6 +32,11 @@ app.get('/exo-query-string', (req, res) => {
 	res.send('hello');
 });
 
+app.get('/get-user/:userId', (req, res) => {
+	const { userId } = req.params;
+	res.send(`User ID: ${userId}`);
+});
+
 app.listen(PORT, () => {
 	console.log(`Example app listening on http://localhost:${PORT}`);
 });
