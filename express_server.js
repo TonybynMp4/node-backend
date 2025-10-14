@@ -3,6 +3,8 @@ import express from 'express';
 const app = express();
 const PORT = 3000;
 
+app.use(express.json());
+
 app.get('/', (req, res) => {
 	res.send('Hello from Express!');
 });
@@ -20,6 +22,11 @@ app.get('/some-json', (req, res) => {
 
 app.get('/transaction', (req, res) => {
 	res.json([100, 2000, 3000]);
+});
+
+app.post('/data', (req, res) => {
+	console.log('Body:', req.body);
+	res.json(req.body);
 });
 
 app.get('/exo-query-string', (req, res) => {
