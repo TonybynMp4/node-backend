@@ -24,6 +24,11 @@ app.get('/transaction', (req, res) => {
 
 app.get('/exo-query-string', (req, res) => {
 	console.log('Query params:', req.query);
+	const { age } = req.query;
+	if (age) {
+		res.send(`<h1>${age}</h1>`);
+		return;
+	}
 	res.send('hello');
 });
 
