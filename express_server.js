@@ -22,6 +22,11 @@ app.get('/transaction', (req, res) => {
 	res.json([100, 2000, 3000]);
 });
 
+app.get('/exo-query-string', (req, res) => {
+	console.log('Query params:', req.query);
+	res.send('hello');
+});
+
 app.listen(PORT, () => {
 	console.log(`Example app listening on http://localhost:${PORT}`);
 });
