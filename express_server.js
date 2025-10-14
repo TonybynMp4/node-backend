@@ -16,6 +16,10 @@ app.get('/some-json', (req, res) => {
 	res.json(user);
 });
 
+app.get('/transaction', (req, res) => {
+	res.json([100, 2000, 3000]);
+});
+
 app.listen(PORT, () => {
 	console.log(`Example app listening on http://localhost:${PORT}`);
 });
