@@ -1,11 +1,13 @@
 import 'dotenv/config';
 import express from 'express';
 import loggerMiddleware from './src/middlewares/logger.js';
+import headersLogger from './src/middlewares/headersLogger.js';
 import { router } from './src/routes.js';
 
 const app = express();
 const PORT = 3000;
 
+app.use(headersLogger);
 app.use(loggerMiddleware('before json'));
 app.use(express.json());
 app.use(loggerMiddleware('after json'));
