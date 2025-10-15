@@ -17,6 +17,10 @@ router.get('/', (_, res) => {
 	res.send('Hello from Express!');
 });
 
+router.get('/hello', (_, res) => {
+	res.send('<h1>hello</h1>');
+});
+
 router.get('/some-html', (_, res) => {
 	res.send('<html><body><h1>bonjour html</h1></body></html>');
 });
@@ -30,6 +34,14 @@ router.get('/some-json', (req, res) => {
 
 router.get('/transaction', (_, res) => {
 	res.json([100, 2000, 3000]);
+});
+
+router.get('/restricted1', (_req, res) => {
+	res.json({ message: 'topsecret' });
+});
+
+router.get('/restricted2', (_req, res) => {
+	res.send('<h1>Admin space</h1>');
 });
 
 router.post('/data', (req, res) => {
