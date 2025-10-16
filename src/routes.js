@@ -1,7 +1,11 @@
 import { Router } from 'express';
 import { randomUUID } from 'node:crypto';
-import { checkCredentials, registerAuthenticatedUser } from './db/inMemoryUserRepository.js';
-import { getUsers } from './db/utils.js';
+import {
+	checkCredentials,
+	getUsers,
+	newUserRegistered,
+	registerAuthenticatedUser,
+} from './db/user.js';
 
 const tasks = [
 	{
@@ -38,11 +42,11 @@ router.get('/transaction', (_, res) => {
 	res.json([100, 2000, 3000]);
 });
 
-router.get('/restricted1', (_req, res) => {
+router.get('/restricted1', (_, res) => {
 	res.json({ message: 'topsecret' });
 });
 
-router.get('/restricted2', (_req, res) => {
+router.get('/restricted2', (_, res) => {
 	res.send('<h1>Admin space</h1>');
 });
 
@@ -137,25 +141,59 @@ router.get('/get-user/:userId', (req, res) => {
 	res.send(`User ID: ${userId}`);
 });
 
-router.get('/get-users', async (req, res) => {
-	const users = await getUsers();
-	res.json(users);
+router.get('/get-users', async (_req, res) => {
+	try {
+		const users = await getUsers();
+		res.json(users);
+	} catch (error) {
+		console.error('Unable to fetch users:', error);
+		res.status(500).json({ error: 'Unable to fetch users.' });
+	}
 });
 
-router.post('/authenticate', (req, res) => {
+router.post('/register', async (req, res) => {
 	const { email, password } = req.body ?? {};
 
-	if (typeof email !== 'string' || typeof password !== 'string') {
+	if (!email || typeof email !== 'string' || !password || typeof password !== 'string') {
 		return res.status(400).json({ error: 'Email and password are required.' });
 	}
 
-	const user = checkCredentials(email, password);
-	if (!user) {
-		return res.status(403).json({ error: 'Invalid credentials.' });
+	try {
+		const user = await newUserRegistered({
+			email: email.trim().toLowerCase(),
+			password: password.trim(),
+		});
+
+		if (!user) {
+			return res.status(500).json({ error: 'Unable to register user.' });
+		}
+
+		res.status(201).json(user);
+	} catch (error) {
+		return res.status(500).json({ error: error?.message });
+	}
+});
+
+router.post('/authenticate', async (req, res) => {
+	const { email, login, password } = req.body ?? {};
+	const identifier = typeof email === 'string' ? email : login;
+
+	if (typeof identifier !== 'string' || typeof password !== 'string') {
+		return res.status(400).json({ error: 'Email (or login) and password are required.' });
 	}
 
-	const token = randomUUID();
-	registerAuthenticatedUser(token, email);
+	try {
+		const user = await checkCredentials(identifier, password);
+		if (!user) {
+			return res.status(403).json({ error: 'Invalid credentials.' });
+		}
 
-	res.json({ token });
+		const token = randomUUID();
+		registerAuthenticatedUser(token, user);
+
+		res.json({ token, user });
+	} catch (error) {
+		console.error('Authentication error:', error);
+		res.status(500).json({ error: 'Internal server error.' });
+	}
 });
