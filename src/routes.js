@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { randomUUID } from 'node:crypto';
+import { checkCredentials, registerAuthenticatedUser } from './db/inMemoryUserRepository.js';
 import { getUsers } from './db/utils.js';
-import { registerAuthenticatedUser } from './security/userTokens.js';
 
 const tasks = [
 	{
@@ -147,6 +147,11 @@ router.post('/authenticate', (req, res) => {
 
 	if (typeof email !== 'string' || typeof password !== 'string') {
 		return res.status(400).json({ error: 'Email and password are required.' });
+	}
+
+	const user = checkCredentials(email, password);
+	if (!user) {
+		return res.status(403).json({ error: 'Invalid credentials.' });
 	}
 
 	const token = randomUUID();

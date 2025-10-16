@@ -1,4 +1,4 @@
-import { findAuthenticatedUser } from "../security/userTokens.js";
+import { findAuthenticatedUser } from "../db/inMemoryUserRepository.js";
 
 const unprotectedRoutes = [
 	'/',
