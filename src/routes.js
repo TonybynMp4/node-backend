@@ -139,3 +139,16 @@ router.get('/get-users', async (req, res) => {
 	const users = await getUsers();
 	res.json(users);
 });
+
+router.post('/authenticate', (req, res) => {
+	const { email, password } = req.body ?? {};
+
+	if (typeof email !== 'string' || typeof password !== 'string') {
+		return res.status(400).json({ error: 'Email and password are required.' });
+	}
+
+	const token = randomUUID();
+	registerAuthenticatedUser(token, email);
+
+	res.json({ token });
+});

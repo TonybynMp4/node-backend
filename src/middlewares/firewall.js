@@ -1,3 +1,4 @@
+import { findAuthenticatedUser } from "../security/userTokens.js";
 
 const unprotectedRoutes = [
 	'/',
@@ -17,10 +18,6 @@ function isUnprotectedRoute(pathname) {
 	});
 }
 
-function isTokenValid(headers) {
-	return headers?.token === '42';
-}
-
 export default function firewall(req, res, next) {
 	if (isUnprotectedRoute(req.path)) {
 		return next();
@@ -31,5 +28,11 @@ export default function firewall(req, res, next) {
 		return res.status(403).json({ error: 'Forbidden' });
 	}
 
+	const authenticatedUser = findAuthenticatedUser(token);
+	if (!authenticatedUser) {
+		return res.status(403).json({ error: 'Forbidden' });
+	}
+
+	req.authenticatedUser = authenticatedUser;
 	next();
 }
