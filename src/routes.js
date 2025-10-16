@@ -1,5 +1,7 @@
 import { Router } from 'express';
+import { randomUUID } from 'node:crypto';
 import { getUsers } from './db/utils.js';
+import { registerAuthenticatedUser } from './security/userTokens.js';
 
 const tasks = [
 	{
